@@ -92,10 +92,10 @@
       toponimi.addTo(map);
 
       // GeoJSON Polyline Jalan
-      map.createPane('panejalan');
-      map.getPane('panejalan').style.zIndex = 401;
+      map.createPane("panejalan");
+      map.getPane("panejalan").style.zIndex = 401;
       var jalan = L.geoJSON(null, {
-		pane: 'panejalan',
+        pane: "panejalan",
         // Style
         style: function (feature) {
           return {
@@ -130,11 +130,50 @@
         map.addLayer(jalan); // Menambahkan GeoJSON Polyline Jalan ke dalam peta
       });
 
+      // GeoJSON Polyline Sungai
+      map.createPane("panesungai");
+      map.getPane("panesungai").style.zIndex = 400;
+      var sungai = L.geoJSON(null, {
+        pane: "panesungai",
+        // Style
+        style: function (feature) {
+          return {
+            color: "blue",
+            opacity: 1,
+            weight: 3,
+          };
+        },
+        // onEachFeature
+        onEachFeature: function (feature, layer) {
+          // variable popup content
+          var popup_content =
+            "Fungsi: " +
+            feature.properties.fungsi +
+            "<br>" +
+            "Panjang (m): " +
+            feature.properties.panjang_m;
+
+          layer.on({
+            mouseover: function (e) {
+              jalan.bindTooltip(feature.properties.NAMA_UNSUR, {
+                direction: "auto",
+                sticky: true,
+              });
+            },
+          });
+        },
+      });
+
+      $.getJSON("data/sungai.geojson", function (data) {
+        sungai.addData(data); // Menambahkan data ke dalam GeoJSON Polyline Sungai
+        map.addLayer(sungai); // Menambahkan GeoJSON Polyline Sungai ke dalam peta
+      });
+
       // GeoJSON Polygon Jumlah Penduduk
-	  map.createPane('panejumlahpenduduk');
-      map.getPane('panejumlahpenduduk').style.zIndex = 301;
+      map.createPane("panejumlahpenduduk");
+      map.getPane("panejumlahpenduduk").style.zIndex = 301;
       var jumlah_penduduk = L.geoJSON(null, {
-		pane: 'panejumlahpenduduk',
+        pane: "panejumlahpenduduk",
         // Style
         style: function (feature) {
           if (feature.properties.Penduduk <= 15000) {
@@ -202,8 +241,9 @@
       };
 
       var overlayMaps = {
-        Toponimi: toponimi,
-        Jalan: jalan,
+        "Toponimi": toponimi,
+        "Jalan": jalan,
+		"Sungai": sungai,
         "Jumlah Penduduk": jumlah_penduduk,
       };
 
